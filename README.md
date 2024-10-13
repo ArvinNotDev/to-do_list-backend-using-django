@@ -4,7 +4,7 @@ This project is built using Django and Django REST Framework. It provides a back
 
 ## Features
 
-- RESTful APIs for various resources (e.g., users, products, posts, etc.)
+- RESTful APIs for various resources
 - Token-based authentication using Simple JWT
 - User registration and login functionality
 - CRUD operations for resources
