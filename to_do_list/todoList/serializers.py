@@ -1,7 +1,9 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth import get_user_model
 from .models import Task
 
+User = get_user_model()
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     username_field = 'username'
@@ -15,9 +17,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             self.username_field = 'username'
 
         if self.username_field != 'username':
-            username = models.User.objects.filter(
-                **{self.username_field: username}
-            ).values_list('username', flat=True).first()
+            user = User.objects.filter(**{self.username_field: username}).first()
+            if user is not None:
+                username = user.username
+            else:
+                raise serializers.ValidationError('User not found.')
+
             self.username_field = 'username'
             attrs['username'] = username
 
@@ -30,4 +35,3 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = ['id', 'title', 'description', 'status', 'due_date', 'done_at']
         read_only_fields = ['id', 'done_at']
-

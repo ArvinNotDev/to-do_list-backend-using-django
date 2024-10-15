@@ -43,10 +43,10 @@ INSTALLED_APPS = [
     # apps
     'accounts.apps.AccountsConfig',
     'todoList.apps.TodolistConfig',
-    'corsheaders',
    
     # third parties
     'rest_framework',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
