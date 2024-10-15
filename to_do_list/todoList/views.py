@@ -6,6 +6,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 from .models import Task
 from .serializers import TaskSerializer, CustomTokenObtainPairSerializer
@@ -19,23 +20,30 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 class TaskListView(APIView):
     """
-    api to list all tasks or create a new task.
+    API to list all tasks or create a new task.
     """
     authentication_classes = [authentication.JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         tasks = Task.objects.filter(user=request.user.id).order_by('due_date')
-        serializer = TaskSerializer(tasks, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        # Apply pagination
+        paginator = PageNumberPagination()
+        paginator.page_size = 5
+        paginated_tasks = paginator.paginate_queryset(tasks, request)
+        
+        serializer = TaskSerializer(paginated_tasks, many=True)
+        
+        # Return paginated response
+        return paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
         serializer = TaskSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return render(404)
-
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class TaskDetailView(APIView):
     """
