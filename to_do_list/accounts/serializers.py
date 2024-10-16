@@ -28,8 +28,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
 
 
-
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
@@ -40,23 +38,23 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate_password(self, value):
         if len(value) < 8:
-            raise serializers.ValidationError("رمز عبور باید حداقل 8 رقمی باشد.")
+            raise serializers.ValidationError("Password must be at least 8 characters long.")
         if not any(char in string.ascii_uppercase for char in value):
-            raise serializers.ValidationError("حداقل یک حرف بزرگ باید داشته باشد.")
+            raise serializers.ValidationError("Password must contain at least one uppercase letter.")
         if not any(char in string.ascii_lowercase for char in value):
-            raise serializers.ValidationError("حداقل یک حرف کوچک باید داشته باشد.")
+            raise serializers.ValidationError("Password must contain at least one lowercase letter.")
         if not any(char in string.digits for char in value):
-            raise serializers.ValidationError("رمز عبور باید حداقل یک شماره داشته باشد.")
+            raise serializers.ValidationError("Password must contain at least one number.")
         return value
 
     def validate_username(self, value):
         if models.User.objects.filter(username=value).exists():
-            raise serializers.ValidationError("اکانتی با این نام کاربری وجود دارد.")
+            raise serializers.ValidationError("A user with this username already exists.")
         return value
 
     def validate_email(self, value):
         if models.User.objects.filter(email=value).exists():
-            raise serializers.ValidationError("اکانتی با این نام ایمیل وجود دارد.")
+            raise serializers.ValidationError("A user with this email already exists.")
         return value
 
     def create(self, validated_data):
@@ -72,6 +70,7 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(password)
         return super().update(instance, validated_data)
 
+
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(required=False)
     password = serializers.CharField(required=False)
@@ -85,7 +84,6 @@ class LoginSerializer(serializers.Serializer):
             if user is None:
                 raise serializers.ValidationError('Invalid username or password.')
         else:
-            raise serializers.ValidationError('Must include username and password.')
+            raise serializers.ValidationError('Both username and password are required.')
 
         return {'user': user}
-
