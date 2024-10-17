@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import get_user_model
-from .models import Task
+from .models import Task, Category
 
 User = get_user_model()
 
@@ -35,3 +35,9 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = ['id', 'title', 'description', 'status', 'due_date', 'done_at']
         read_only_fields = ['id', 'done_at']
+
+
+class CatSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['name', 'parent']

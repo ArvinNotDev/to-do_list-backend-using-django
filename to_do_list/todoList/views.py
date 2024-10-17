@@ -8,8 +8,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
-from .models import Task
-from .serializers import TaskSerializer, CustomTokenObtainPairSerializer
+from .models import Task, Category
+from .serializers import TaskSerializer, CustomTokenObtainPairSerializer, CatSerializer
 from django.utils.translation import gettext_lazy as _
 
 
@@ -78,3 +78,13 @@ class TaskDetailView(APIView):
             task.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         raise Http404("No Task matches the given query.")
+class CategoryView(APIView):
+    """
+    API to view categories
+    """
+
+    def get(self, request):
+        categories = Category.objects.all()
+        serializer = CatSerializer(categories, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
